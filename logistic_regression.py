@@ -17,20 +17,16 @@ files = ["NBA_2004_SHOTS.csv", "NBA_2005_SHOTS.csv", "NBA_2006_SHOTS.csv",
          "NBA_2019_SHOTS.csv", "NBA_2020_SHOTS.csv", "NBA_2021_SHOTS.csv",
          "NBA_2022_SHOTS.csv", "NBA_2023_SHOTS.csv", "NBA_2024_SHOTS.csv"]
 
-# Load and concatenate the files
 dataframes = [pd.read_csv(file) for file in files]
 dataset = pd.concat(dataframes, ignore_index=True)
 
 dataset = dataset[["POSITION", "BASIC_ZONE", "ZONE_NAME", "ZONE_RANGE", "LOC_X", "LOC_Y", "SHOT_DISTANCE", "QUARTER", "MINS_LEFT", "SECS_LEFT", "SHOT_TYPE", "ACTION_TYPE", "SHOT_MADE"]]
 dataset.columns = ['pos', 'bzone', 'zone', 'zoner', 'x', 'y', 'dist', 'quarter', 'mins', 'secs', 'shot', 'type', 'made']
-# Convert the target variable to numerical
- # Adjust mapping as necessary
 
-# Split data into features and target
 X = dataset.drop("made", axis=1)
 y = dataset["made"]
 
-# One-Hot Encode categorical variables
+
 X = pd.get_dummies(X, drop_first=True)
 
 test_sizes= [0.1,0.2,0.3]
@@ -38,27 +34,27 @@ iterations= [100,1000,2000]
 print('Logistic Regression')
 for test_size in test_sizes:
     print(f'(Test Size: {test_size})')
-    # Split X and y into training and testing sets
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
 
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
 
-    # Instantiate the model
+  
     for iteration in iterations:
         print(f'Iteration: {iteration}')
         logreg = LogisticRegression(random_state=16, max_iter=iteration)
 
-        # Fit the model with data
+        
         logreg.fit(X_train, y_train)
 
-        # Predict
+       
         y_pred = logreg.predict(X_test)
 
-        # Confusion Matrix
+      
         cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
-        class_names = [0, 1]  # Adjust based on your target variable
+        class_names = [0, 1]  
         fig, ax = plt.subplots()
         tick_marks = np.arange(len(class_names))
         plt.xticks(tick_marks, class_names)
@@ -72,5 +68,5 @@ for test_size in test_sizes:
 
         plt.text(0.5, 257.44, 'Predicted label', ha='center', va='bottom', fontsize=12)
 
-        # Classification report
+       
         print(classification_report(y_test, y_pred, target_names=['miss', 'made']))
